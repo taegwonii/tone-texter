@@ -1,0 +1,42 @@
+# API Keys & Secrets - NEVER COMMIT
+.env
+.env.local
+.env.*.local
+*.key
+secrets.json
+config.local.js
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Build outputs (if we add bundler later)
+dist/
+build/
+*.zip
+*.crx
+
+# Dependencies (if we add npm later)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Testing
+coverage/
+
+# Temp
+tmp/
+temp/
+*.tmp

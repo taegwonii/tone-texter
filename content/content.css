@@ -1,0 +1,48 @@
+/* Floating UI injected into web pages */
+/* Use high-specificity selectors and unique prefixes to avoid conflicts */
+
+.tone-texter-floating-btn {
+    position: absolute;
+    z-index: 999999;
+    padding: 6px 10px;
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    display: none;
+}
+
+.tone-texter-floating-btn:hover {
+    background: #4f46e5;
+}
+
+.tone-texter-suggestion-panel {
+    position: absolute;
+    z-index: 999999;
+    min-width: 280px;
+    padding: 12px;
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    display: none;
+}
+
+.tone-texter-suggestion-item {
+    padding: 8px 10px;
+    margin-bottom: 4px;
+    background: #fafafa;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.tone-texter-suggestion-item:hover {
+    background: #f0f0ff;
+}
