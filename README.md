@@ -42,6 +42,17 @@ Many international students and English learners know what they want to say, but
 - **AI:** OpenAI / Claude / Gemini API (configurable)
 - **Storage:** Chrome Storage API
 
+## 💡 Model Choice
+
+Tone Texter uses **Claude Haiku (Haiku 4.5)** for text generation.
+
+We chose Haiku because it provides:
+- fast response time
+- reliable natural language understanding
+- stable performance for real-time text suggestions
+
+This makes it well-suited for a responsive Chrome extension experience.
+
 ## 📋 Development Roadmap
 
 - [ ] **Step 1** — Extension scaffold & popup UI
