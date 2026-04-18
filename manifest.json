@@ -23,6 +23,8 @@
     }
   },
   
+  "options_page": "popup/options.html",
+  
   "background": {
     "service_worker": "background/service-worker.js",
     "type": "module"

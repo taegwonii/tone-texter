@@ -36,9 +36,8 @@ Original message: "${text}"
 Rewrite this in ${toneInfo.name} style.
 Guide: ${toneInfo.guide}
 
-Return exactly 3 different alternatives as a JSON array of strings.
-Do NOT include explanations — only the JSON array.
-Example format: ["option 1", "option 2", "option 3"]`;
+Return a JSON object with a "suggestions" key containing exactly 3 different alternatives.
+Format: {"suggestions": ["option 1", "option 2", "option 3"]}`;
 }
 
 export { TONE_DESCRIPTIONS };

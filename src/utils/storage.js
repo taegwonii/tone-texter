@@ -18,7 +18,7 @@ export async function setApiKey(apiKey) {
 
 export async function getProvider() {
     const result = await chrome.storage.local.get(STORAGE_KEYS.PROVIDER);
-    return result[STORAGE_KEYS.PROVIDER] || 'gemini'; // Default
+    return result[STORAGE_KEYS.PROVIDER] || 'openai'; // Default
 }
 
 export async function setProvider(provider) {

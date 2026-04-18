@@ -1,5 +1,4 @@
 // Popup Script - handles UI interactions in the extension popup
-// TODO: Step 3에서 LLM 통합
 
 console.log('💬 Tone Texter popup loaded');
 
@@ -37,15 +36,30 @@ generateBtn.addEventListener('click', async () => {
         return;
     }
     
-    // TODO: Step 3 - Call LLM API through background service worker
-    // Placeholder for now
-    const mockSuggestions = [
-        'ur so hot 🔥',
-        'omg you look amazing',
-        "you're actually so fine"
-    ];
+    // Disable button during request
+    generateBtn.disabled = true;
+    generateBtn.textContent = '⏳ Generating...';
     
-    displaySuggestions(mockSuggestions);
+    try {
+        // Ask service worker to call the LLM (needed for CORS)
+        const response = await chrome.runtime.sendMessage({
+            action: 'getSuggestions',
+            text: text,
+            tone: selectedTone
+        });
+        
+        if (!response.success) {
+            throw new Error(response.error);
+        }
+        
+        displaySuggestions(response.suggestions);
+    } catch (err) {
+        console.error(err);
+        alert(`Error: ${err.message}\n\nCheck your API key in Settings.`);
+    } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = '✨ Get Suggestions';
+    }
 });
 
 function displaySuggestions(suggestions) {
@@ -54,24 +68,24 @@ function displaySuggestions(suggestions) {
         const item = document.createElement('div');
         item.className = 'suggestion-item';
         item.textContent = text;
-        item.addEventListener('click', () => copyToClipboard(text));
+        item.addEventListener('click', () => copyToClipboard(text, item));
         suggestionList.appendChild(item);
     });
     suggestionsSection.classList.remove('hidden');
 }
 
-async function copyToClipboard(text) {
+async function copyToClipboard(text, element) {
     try {
         await navigator.clipboard.writeText(text);
-        // TODO: Show toast notification
-        console.log('Copied:', text);
+        const original = element.textContent;
+        element.textContent = '✓ Copied!';
+        setTimeout(() => { element.textContent = original; }, 1000);
     } catch (err) {
         console.error('Copy failed:', err);
     }
 }
 
-// Settings (TODO: Step 2)
+// Open settings page
 settingsBtn.addEventListener('click', () => {
-    // TODO: Open settings page to configure API key
-    alert('Settings page - coming in Step 2');
+    chrome.runtime.openOptionsPage();
 });
