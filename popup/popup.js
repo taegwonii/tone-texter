@@ -1,91 +1,58 @@
-// Popup Script - handles UI interactions in the extension popup
+'use strict';
 
-console.log('💬 Tone Texter popup loaded');
+const apiKeyInput   = document.getElementById('apiKey');
+const saveBtn       = document.getElementById('saveBtn');
+const statusEl      = document.getElementById('status');
+const toggleVis     = document.getElementById('toggleVis');
+const enabledToggle = document.getElementById('enabledToggle');
+const toggleLabel   = document.getElementById('toggleLabel');
+const themeToggle   = document.getElementById('themeToggle');
 
-// State
-let selectedTone = null;
+chrome.storage.local.get(['apiKey', 'enabled', 'theme'], ({ apiKey, enabled, theme }) => {
+  if (apiKey) {
+    apiKeyInput.value = apiKey;
+    showStatus('API key is saved ✓', 'success');
+  }
+  const isEnabled = enabled !== false;
+  enabledToggle.checked = isEnabled;
+  toggleLabel.textContent = isEnabled ? 'ToneTexter Active' : 'ToneTexter Paused';
 
-// DOM elements
-const inputText = document.getElementById('input-text');
-const toneButtons = document.querySelectorAll('.tone-btn');
-const generateBtn = document.getElementById('generate-btn');
-const suggestionsSection = document.getElementById('suggestions');
-const suggestionList = document.getElementById('suggestion-list');
-const settingsBtn = document.getElementById('settings-btn');
-
-// Tone selection
-toneButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        toneButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedTone = btn.dataset.tone;
-    });
+  const isLight = theme === 'light';
+  themeToggle.checked = isLight;
+  applyTheme(isLight);
 });
 
-// Generate suggestions
-generateBtn.addEventListener('click', async () => {
-    const text = inputText.value.trim();
-    
-    if (!text) {
-        alert('Please type a message first!');
-        return;
-    }
-    
-    if (!selectedTone) {
-        alert('Please choose a tone!');
-        return;
-    }
-    
-    // Disable button during request
-    generateBtn.disabled = true;
-    generateBtn.textContent = '⏳ Generating...';
-    
-    try {
-        // Ask service worker to call the LLM (needed for CORS)
-        const response = await chrome.runtime.sendMessage({
-            action: 'getSuggestions',
-            text: text,
-            tone: selectedTone
-        });
-        
-        if (!response.success) {
-            throw new Error(response.error);
-        }
-        
-        displaySuggestions(response.suggestions);
-    } catch (err) {
-        console.error(err);
-        alert(`Error: ${err.message}\n\nCheck your API key in Settings.`);
-    } finally {
-        generateBtn.disabled = false;
-        generateBtn.textContent = '✨ Get Suggestions';
-    }
+enabledToggle.addEventListener('change', () => {
+  const isEnabled = enabledToggle.checked;
+  chrome.storage.local.set({ enabled: isEnabled });
+  toggleLabel.textContent = isEnabled ? 'ToneTexter Active' : 'ToneTexter Paused';
 });
 
-function displaySuggestions(suggestions) {
-    suggestionList.innerHTML = '';
-    suggestions.forEach(text => {
-        const item = document.createElement('div');
-        item.className = 'suggestion-item';
-        item.textContent = text;
-        item.addEventListener('click', () => copyToClipboard(text, item));
-        suggestionList.appendChild(item);
-    });
-    suggestionsSection.classList.remove('hidden');
+themeToggle.addEventListener('change', () => {
+  const isLight = themeToggle.checked;
+  chrome.storage.local.set({ theme: isLight ? 'light' : 'dark' });
+  applyTheme(isLight);
+});
+
+function applyTheme(isLight) {
+  document.body.classList.toggle('light', isLight);
 }
 
-async function copyToClipboard(text, element) {
-    try {
-        await navigator.clipboard.writeText(text);
-        const original = element.textContent;
-        element.textContent = '✓ Copied!';
-        setTimeout(() => { element.textContent = original; }, 1000);
-    } catch (err) {
-        console.error('Copy failed:', err);
-    }
-}
-
-// Open settings page
-settingsBtn.addEventListener('click', () => {
-    chrome.runtime.openOptionsPage();
+toggleVis.addEventListener('click', () => {
+  apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
 });
+
+saveBtn.addEventListener('click', async () => {
+  const key = apiKeyInput.value.trim();
+  if (!key) { showStatus('Please enter your API key.', 'error'); return; }
+  if (!key.startsWith('sk-ant-')) { showStatus('Key should start with sk-ant-…', 'error'); return; }
+  await chrome.storage.local.set({ apiKey: key });
+  showStatus('Saved! ToneTexter is ready.', 'success');
+});
+
+apiKeyInput.addEventListener('keydown', e => { if (e.key === 'Enter') saveBtn.click(); });
+
+function showStatus(msg, type) {
+  statusEl.textContent = msg;
+  statusEl.className = `status ${type}`;
+}

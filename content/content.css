@@ -1,48 +1,189 @@
-/* Floating UI injected into web pages */
-/* Use high-specificity selectors and unique prefixes to avoid conflicts */
-
-.tone-texter-floating-btn {
-    position: absolute;
-    z-index: 999999;
-    padding: 6px 10px;
-    background: #6366f1;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 12px;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    display: none;
+#texttone-overlay {
+  position: absolute;
+  z-index: 2147483647;
+  background: #12121e;
+  border: 1px solid #2d2d4e;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(124, 58, 237, 0.08);
+  padding: 14px 14px 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+  font-size: 13px;
+  color: #d1d1e0;
+  display: none;
+  min-width: 260px;
+  max-width: 380px;
+  box-sizing: border-box;
+  line-height: 1.4;
+  pointer-events: all;
 }
 
-.tone-texter-floating-btn:hover {
-    background: #4f46e5;
+#texttone-overlay.tt-visible {
+  display: block;
+  filter: blur(4px);
+  opacity: 0.5;
+  transition: filter 0.2s ease, opacity 0.2s ease;
 }
 
-.tone-texter-suggestion-panel {
-    position: absolute;
-    z-index: 999999;
-    min-width: 280px;
-    padding: 12px;
-    background: white;
-    border: 1px solid #e5e5e5;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    display: none;
+#texttone-overlay.tt-visible:hover {
+  filter: blur(0);
+  opacity: 1;
 }
 
-.tone-texter-suggestion-item {
-    padding: 8px 10px;
-    margin-bottom: 4px;
-    background: #fafafa;
-    border-radius: 6px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: background 0.15s;
+.tt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
-.tone-texter-suggestion-item:hover {
-    background: #f0f0ff;
+.tt-header-btns { display: flex; align-items: center; gap: 4px; }
+
+.tt-theme-toggle {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 16px;
+  cursor: pointer;
 }
+.tt-theme-checkbox { opacity: 0; width: 0; height: 0; position: absolute; }
+.tt-theme-slider {
+  position: absolute;
+  inset: 0;
+  background: #2a2a44;
+  border-radius: 16px;
+  transition: background 0.2s;
+}
+.tt-theme-slider::before {
+  content: '';
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  left: 2px;
+  top: 2px;
+  background: #888;
+  border-radius: 50%;
+  transition: transform 0.2s, background 0.2s;
+}
+.tt-theme-checkbox:checked + .tt-theme-slider { background: #7c3aed; }
+.tt-theme-checkbox:checked + .tt-theme-slider::before { transform: translateX(14px); background: #fff; }
+
+.tt-logo {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  color: #8b5cf6;
+  text-transform: uppercase;
+}
+
+.tt-close {
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+.tt-close:hover { color: #d1d1e0; background: rgba(255,255,255,0.06); }
+
+.tt-hint { font-size: 11px; color: #555; margin-bottom: 10px; }
+
+.tt-tones { display: flex; gap: 6px; margin-bottom: 10px; }
+
+.tt-tone {
+  flex: 1;
+  padding: 6px 4px;
+  border: 1px solid #2a2a44;
+  border-radius: 8px;
+  background: #1a1a30;
+  color: #7a7a9a;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.tt-tone:hover  { background: #22223a; color: #d1d1e0; border-color: #5b21b6; }
+.tt-tone.active { background: #5b21b6; color: #fff; border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.2); }
+
+.tt-loading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #666;
+  padding: 6px 0 4px;
+  font-size: 12px;
+}
+
+.tt-spinner {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #2d2d4e;
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: tt-spin 0.65s linear infinite;
+}
+@keyframes tt-spin { to { transform: rotate(360deg); } }
+
+.tt-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px 9px 12px;
+  border-radius: 9px;
+  background: #1c1c32;
+  border: 1px solid #2a2a44;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  color: #d1d1e0;
+  user-select: none;
+}
+.tt-suggestion:last-child { margin-bottom: 0; }
+.tt-suggestion:hover  { background: #26264a; border-color: #5b21b6; color: #fff; }
+.tt-suggestion:active { background: #2e2e5a; }
+
+.tt-suggestion-text { flex: 1; }
+
+.tt-copy {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid #2a2a44;
+  border-radius: 6px;
+  color: #555;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 3px 6px;
+  transition: color 0.12s, background 0.12s, border-color 0.12s;
+}
+.tt-copy:hover      { color: #d1d1e0; background: rgba(255,255,255,0.06); border-color: #5b21b6; }
+.tt-copy.tt-copy-done { color: #4ade80; border-color: #4ade80; }
+
+.tt-empty { color: #556; font-size: 12px; padding: 6px 0 2px; }
+.tt-error { color: #f87171; font-size: 12px; padding: 6px 0 2px; line-height: 1.5; }
+
+/* ── Light mode ── */
+#texttone-overlay.tt-light {
+  background: #ffffff;
+  border-color: #ddd;
+  color: #1a1a2e;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(124,58,237,0.1);
+}
+#texttone-overlay.tt-light .tt-logo  { color: #7c3aed; }
+#texttone-overlay.tt-light .tt-hint  { color: #999; }
+#texttone-overlay.tt-light .tt-close { color: #aaa; }
+#texttone-overlay.tt-light .tt-close:hover { color: #333; background: rgba(0,0,0,0.05); }
+#texttone-overlay.tt-light .tt-tone  { background: #f3f0ff; border-color: #ddd; color: #5a5a7a; }
+#texttone-overlay.tt-light .tt-tone:hover  { background: #ede9fe; border-color: #7c3aed; color: #1a1a2e; }
+#texttone-overlay.tt-light .tt-tone.active { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+#texttone-overlay.tt-light .tt-suggestion  { background: #f8f7ff; border-color: #e0ddf7; color: #1a1a2e; }
+#texttone-overlay.tt-light .tt-suggestion:hover { background: #ede9fe; border-color: #7c3aed; }
+#texttone-overlay.tt-light .tt-copy { border-color: #ddd; color: #aaa; }
+#texttone-overlay.tt-light .tt-copy:hover { color: #333; border-color: #7c3aed; }
+#texttone-overlay.tt-light .tt-loading { color: #aaa; }
+#texttone-overlay.tt-light .tt-empty  { color: #aaa; }
+#texttone-overlay.tt-light .tt-error  { color: #e53e3e; }

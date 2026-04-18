@@ -1,51 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Tone Texter</title>
-    <link rel="stylesheet" href="popup.css">
+  <meta charset="UTF-8" />
+  <title>ToneTexter Settings</title>
+  <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>💬 Tone Texter</h1>
-            <p class="subtitle">Text naturally, sound like a native</p>
-        </header>
+  <div class="logo">✦ ToneTexter</div>
+  <div class="tagline">Sound more natural when texting in English</div>
 
-        <main>
-            <div class="input-section">
-                <label for="input-text">Your message:</label>
-                <textarea 
-                    id="input-text" 
-                    placeholder="Type what you want to say..."
-                    rows="4"></textarea>
-            </div>
+  <label>Anthropic API Key</label>
+  <div class="input-row">
+    <input type="password" id="apiKey" placeholder="sk-ant-api03-…" autocomplete="off" />
+    <button class="toggle-vis" id="toggleVis" title="Show/hide key">👁</button>
+  </div>
 
-            <div class="tone-selector">
-                <label>Choose a tone:</label>
-                <div class="tone-buttons">
-                    <button class="tone-btn" data-tone="casual">😊 Casual</button>
-                    <button class="tone-btn" data-tone="friendly">🤗 Friendly</button>
-                    <button class="tone-btn" data-tone="flirty">💕 Flirty</button>
-                    <button class="tone-btn" data-tone="genz">🔥 Gen Z</button>
-                </div>
-            </div>
+  <button class="save-btn" id="saveBtn">Save Key</button>
+  <div class="status" id="status"></div>
 
-            <button id="generate-btn" class="primary-btn">
-                ✨ Get Suggestions
-            </button>
+  <hr />
 
-            <div id="suggestions" class="suggestions-section hidden">
-                <label>Suggestions:</label>
-                <div id="suggestion-list"></div>
-            </div>
-        </main>
+  <div class="toggle-row">
+    <span class="toggle-label">Light Mode</span>
+    <label class="switch">
+      <input type="checkbox" id="themeToggle" />
+      <span class="slider"></span>
+    </label>
+  </div>
 
-        <footer>
-            <button id="settings-btn" class="link-btn">⚙️ Settings</button>
-        </footer>
-    </div>
+  <div class="toggle-row">
+    <span class="toggle-label" id="toggleLabel">ToneTexter Active</span>
+    <label class="switch">
+      <input type="checkbox" id="enabledToggle" checked />
+      <span class="slider"></span>
+    </label>
+  </div>
 
-    <script src="popup.js" type="module"></script>
+  <hr />
+
+  <div class="info">
+    Get your free API key at
+    <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>.
+    <br /><br />
+    Focus any text box on the page — ToneTexter's suggestion panel will appear automatically.
+  </div>
+
+  <div class="tones-preview">
+    <span class="tone-chip">Casual</span>
+    <span class="tone-chip">Friendly</span>
+    <span class="tone-chip">Polite</span>
+    <span class="tone-chip">Gen Z</span>
+  </div>
+
+  <script src="popup.js"></script>
 </body>
 </html>

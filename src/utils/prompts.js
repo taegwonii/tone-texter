@@ -1,43 +1,18 @@
-// Prompt templates for different tone styles
-// These are the core of the product — iterate on them as you test!
+export const SYSTEM_PROMPT = `You are a texting style assistant that helps non-native English speakers sound more natural. When given a message and a tone, provide exactly 3 alternative versions in that tone style.
 
-const TONE_DESCRIPTIONS = {
-    casual: {
-        name: 'Casual',
-        guide: `Rewrite as how native English speakers casually text friends. Use contractions, lowercase, occasional abbreviations (u, ur, lol, tbh). Keep it short and relaxed. No formal grammar needed.`
-    },
-    friendly: {
-        name: 'Friendly',
-        guide: `Rewrite as warm, friendly texting. Feel welcoming and approachable. Can use emojis sparingly. Sound genuine and personable, like texting a good friend.`
-    },
-    flirty: {
-        name: 'Flirty',
-        guide: `Rewrite as playful, flirty texting between people who are into each other. Short, teasing, confident. Can use emojis like 😏 😍 🔥. Avoid being creepy — keep it fun.`
-    },
-    genz: {
-        name: 'Gen Z',
-        guide: `Rewrite in Gen Z texting style. Use current slang (lowkey, fr, no cap, actually, literally, bestie). Lowercase. Dry humor. Feel authentic, not cringe or try-hard.`
-    }
-};
+Tones:
+- Casual: Relaxed, informal, abbreviated (ur, gonna, wanna, lol, tbh, ngl, omg, rn)
+- Friendly: Warm, positive, enthusiastic, approachable, uses emojis naturally
+- Polite: Respectful, courteous, professional but warm — avoids slang
+- Gen Z: Current slang (no cap, bussin, slay, vibe, lowkey, highkey, based, fr, it's giving, understood the assignment)
 
-/**
- * Build the LLM prompt for tone conversion
- */
-export function buildTonePrompt(text, tone) {
-    const toneInfo = TONE_DESCRIPTIONS[tone];
-    if (!toneInfo) {
-        throw new Error(`Unknown tone: ${tone}`);
-    }
-    
-    return `You help non-native English speakers text more naturally.
+Rules:
+- Keep the core meaning of the original message intact
+- Make it sound like how a real native speaker actually texts — not overly formal
+- Do NOT explain or add commentary — just provide the 3 alternatives
+- Return exactly 3 lines, one suggestion per line, no numbering, no bullets, no quotes
+- Keep suggestions short and punchy, as people naturally text`;
 
-Original message: "${text}"
-
-Rewrite this in ${toneInfo.name} style.
-Guide: ${toneInfo.guide}
-
-Return a JSON object with a "suggestions" key containing exactly 3 different alternatives.
-Format: {"suggestions": ["option 1", "option 2", "option 3"]}`;
+export function buildUserMessage(text, tone) {
+  return `Original message: "${text}"\nTone: ${tone}\n\nProvide 3 ${tone} texting alternatives.`;
 }
-
-export { TONE_DESCRIPTIONS };

@@ -1,27 +1,16 @@
-// Background Service Worker
-// Handles API calls (CORS bypass) and message passing between popup/content
+import { fetchSuggestions } from '../src/utils/api.js';
+import { getApiKey } from '../src/utils/storage.js';
 
-console.log('💬 Tone Texter service worker started');
-
-import { getToneSuggestions } from '../src/utils/api.js';
-
-// Install event
-chrome.runtime.onInstalled.addListener((details) => {
-    console.log('Extension installed:', details.reason);
-    // TODO: Open onboarding page on first install
-});
-
-// Message handler
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'getSuggestions') {
-        handleGetSuggestions(request.text, request.tone)
-            .then(suggestions => sendResponse({ success: true, suggestions }))
-            .catch(error => sendResponse({ success: false, error: error.message }));
-        return true; // Keep channel open for async response
-    }
-});
+  if (request.type === 'GET_SUGGESTIONS') {
+    fetchSuggestions(request.text, request.tone)
+      .then(suggestions => sendResponse({ success: true, suggestions }))
+      .catch(err => sendResponse({ success: false, error: err.message }));
+    return true; // Keep channel open for async response
+  }
 
-async function handleGetSuggestions(text, tone) {
-    // TODO: Step 3 - Get API key from storage, call LLM
-    return await getToneSuggestions(text, tone);
-}
+  if (request.type === 'CHECK_API_KEY') {
+    getApiKey().then(key => sendResponse({ hasKey: Boolean(key) }));
+    return true;
+  }
+});

@@ -1,122 +1,58 @@
-// LLM API Wrapper - OpenAI implementation
-// Supports OpenAI (primary). Claude and Gemini stubs kept for future.
+import { SYSTEM_PROMPT, buildUserMessage } from './prompts.js';
+import { getApiKey } from './storage.js';
 
-import { getApiKey, getProvider } from './storage.js';
-import { buildTonePrompt } from './prompts.js';
+const API_URL = 'https://api.anthropic.com/v1/messages';
+const MODEL   = 'claude-haiku-4-5-20251001';
 
-const OPENAI_MODEL = 'gpt-4o-mini'; // Fast & cheap, quality is great for this task
+export async function fetchSuggestions(text, tone) {
+  const apiKey = await getApiKey();
+  if (!apiKey) {
+    throw new Error('No API key set. Click the TextTone icon to add your Anthropic API key.');
+  }
 
-/**
- * Get tone-based suggestions for a given text
- * @param {string} text - Original user message
- * @param {string} tone - 'casual' | 'friendly' | 'flirty' | 'genz'
- * @returns {Promise<string[]>} - Array of suggestion strings
- */
-export async function getToneSuggestions(text, tone) {
-    const apiKey = await getApiKey();
-    const provider = await getProvider();
-    
-    if (!apiKey) {
-        throw new Error('API key not configured. Please set it in settings.');
-    }
-    
-    const prompt = buildTonePrompt(text, tone);
-    
-    switch (provider) {
-        case 'openai':
-            return await callOpenAI(apiKey, prompt);
-        case 'anthropic':
-            return await callClaude(apiKey, prompt);
-        case 'gemini':
-            return await callGemini(apiKey, prompt);
-        default:
-            throw new Error(`Unknown provider: ${provider}`);
-    }
-}
-
-/**
- * Call OpenAI Chat Completions API
- */
-async function callOpenAI(apiKey, prompt) {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: 512,
+      system: [
+        {
+          type: 'text',
+          text: SYSTEM_PROMPT,
+          cache_control: { type: 'ephemeral' },
         },
-        body: JSON.stringify({
-            model: OPENAI_MODEL,
-            messages: [
-                {
-                    role: 'system',
-                    content: 'You help non-native English speakers text more naturally. You always respond with a JSON object containing a "suggestions" array of 3 strings, no other text.'
-                },
-                {
-                    role: 'user',
-                    content: prompt
-                }
-            ],
-            temperature: 0.8,
-            max_tokens: 300,
-            response_format: { type: 'json_object' }
-        })
-    });
+      ],
+      messages: [
+        {
+          role: 'user',
+          content: buildUserMessage(text, tone),
+        },
+      ],
+    }),
+  });
 
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMsg = errorData.error?.message || `HTTP ${response.status}`;
-        
-        if (response.status === 401) {
-            throw new Error('Invalid API key. Please check your settings.');
-        }
-        if (response.status === 429) {
-            throw new Error('Rate limit or quota exceeded. Check your OpenAI billing.');
-        }
-        throw new Error(`OpenAI API error: ${errorMsg}`);
-    }
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error (${response.status})`);
+  }
 
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
-    
-    if (!content) {
-        throw new Error('Empty response from OpenAI');
-    }
+  const data = await response.json();
+  const raw = data.content?.[0]?.text || '';
+  const suggestions = raw
+    .split('\n')
+    .map(s => s.replace(/^[\d]+[.)]\s*|^[-*•]\s*|^["']+|["']+$/g, '').trim())
+    .filter(s => s.length > 0)
+    .slice(0, 3);
 
-    return parseSuggestions(content);
-}
+  if (suggestions.length === 0) {
+    throw new Error('No suggestions returned. Try again.');
+  }
 
-/**
- * Parse LLM response into array of suggestions
- */
-function parseSuggestions(content) {
-    try {
-        const parsed = JSON.parse(content);
-        
-        if (Array.isArray(parsed)) {
-            return parsed.slice(0, 3);
-        }
-        if (Array.isArray(parsed.suggestions)) {
-            return parsed.suggestions.slice(0, 3);
-        }
-        if (Array.isArray(parsed.options)) {
-            return parsed.options.slice(0, 3);
-        }
-        const values = Object.values(parsed).filter(v => typeof v === 'string');
-        if (values.length > 0) {
-            return values.slice(0, 3);
-        }
-        throw new Error('Unexpected response format');
-    } catch (err) {
-        console.error('Failed to parse:', content);
-        throw new Error('Could not parse AI response. Please try again.');
-    }
-}
-
-// Future provider stubs
-async function callClaude(apiKey, prompt) {
-    throw new Error('Claude integration coming soon');
-}
-
-async function callGemini(apiKey, prompt) {
-    throw new Error('Gemini integration coming soon');
+  return suggestions;
 }
