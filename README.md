@@ -31,8 +31,9 @@ Many international students and English learners know what they want to say, but
 **You type:** "You are so attractive"
 
 **Tone Texter suggests:**
-- 💕 Flirty: "ur so hot 🔥"
-- 😊 Friendly: "omg you look amazing"
+- 😎 Casual: "ur so hot"
+- 😊 Friendly: "you look amazing omg"
+- 🤝 Polite: "you look really nice"
 - 🎨 Gen Z: "you're actually so fine"
 
 ## 🛠 Tech Stack
